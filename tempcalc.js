@@ -12,34 +12,57 @@ $(document).ready(function(){
   $("form").submit(function(event) {
       var tempType = $("#mySelect").val();
       var inputNum = $("#inputNum").val();
-      var kelvin = inputNum;
-      var celsius = kelvin - 273;
-      //Convert Celsius to Fahrenheit
-      var fahrenheit = celsius*(9/5)+32;
-      //Round Down
-      fahrenheit = Math.floor(fahrenheit);
-
-      $("#kelvinValue").append(kelvin);       
-      $("#celsiusValue").append(celsius);
-      $("#fahrenheitValue").append(fahrenheit);
-
-      console.log(tempType);
-      console.log(inputNum);
-      console.log(kelvin);
-      console.log(celsius);
-      console.log(fahrenheit);
 
       if (tempType === "k") {
-        alert("Temp Type = k");
-      } else if (tempType === "c") {
-        alert("Temp Type = c");
-      } else if (tempType === "f"){
-        alert("Temp Type = f");
-      } else {
-        alert("Default Value");
-      }
+        var kelvin = inputNum;
+        //Convert Kelvin to Celsius
+        var celsius = kelvin - 273;
+        //Convert Celsius to Fahrenheit
+        var fahrenheit = celsius*(9/5)+32;
+        //Round Down
+        fahrenheit = Math.floor(fahrenheit);
 
-      $("input.btn").prop('disabled', true);
+        $("#kelvinValue").append(kelvin);       
+        $("#celsiusValue").append(celsius);
+        $("#fahrenheitValue").append(fahrenheit);
+        
+        $("input.btn").prop('disabled', true);
+
+      } else if (tempType === "c") {
+        var celsius = inputNum;
+        //Convert Celsius to Fahrenheit
+        var fahrenheit = celsius*(9/5)+32;
+        fahrenheit = Math.floor(fahrenheit);
+        //Convert Celsius to Kelvin
+        var kelvin = Number(celsius) + 273;
+        kelvin = Math.floor(kelvin);
+        $("#celsiusValue").append(celsius);
+        $("#fahrenheitValue").append(fahrenheit);
+        $("#kelvinValue").append(kelvin);
+
+        $("input.btn").prop('disabled', true);
+
+      } else if (tempType === "f"){
+        var fahrenheit = inputNum;
+        //Convert Fahrenheit to Celsius
+        var celsius = (Number(fahrenheit) - 32) * (5/9) ;
+        celsius = Math.floor(celsius);
+        //Convert Celsius to Kelvin
+        var kelvin = Number(celsius) + 273;
+        kelvin = Math.floor(kelvin);
+        $("#celsiusValue").append(celsius);
+        $("#fahrenheitValue").append(fahrenheit);
+        $("#kelvinValue").append(kelvin);
+
+        $("input.btn").prop('disabled', true);
+
+      } else {
+        alert("No Temp Type Selected");
+
+      }
+      
+
+      
       event.preventDefault(); 
   });
 
