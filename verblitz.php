@@ -1,92 +1,164 @@
 <!-- PHP Code -->
 <?php
-  $servername = "162.241.252.197";
-  $username = "burgerg1_dbuser";
-  $password = "2020Tech2020";
-  $dbname = "burgerg1_verblitz";
+$servername = "162.241.252.197";
+$username = "burgerg1_dbuser";
+$password = "2020Tech2020";
+$dbname = "burgerg1_verblitz";
 
-  $randID = NULL;
-  $enInput = NULL;
-  $deGenderInput = NULL;
-  $deInput= NULL;
+$wordID = NULL;
+$prevID = NULL;
+$nextID = NULL;
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
+
+$enInput =        NULL;
+$deGenderInput =  NULL;
+$deInput=         NULL;
+
+$submitType = NULL;
+$en =       NULL;
+$deGender = NULL;
+$de =       NULL;
+
+// Begin POST Method Action
+if ($_SERVER["REQUEST_METHOD"] == "POST") { 
+
+$enInput =        $_POST['en'];
+$deGenderInput =  $_POST['deGender'];
+$deInput =        $_POST['de'];
+
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
-// Write SQL Query
-$sql = "SELECT * FROM burgerg1_verblitz.Dictionary";
 
-$result = $conn->query($sql);
+// prepare and bind
+$sql = $conn->prepare("INSERT INTO burgerg1_verblitz.Dictionary (en, deGender, de) VALUES (?,?,?)");
 
+$sql->bind_param("sss", $enInput, $deGenderInput, $deInput);
 
-
-// collect value of input field
-// $name =   $_POST['fname'];
-
-$randID =         rand(1, 9999999);
-$enInput =        $_POST['en'];
-$deGenderInput =  $_POST['deGender'];
-$deInput =        $_POST['de'];
+$sql->execute();
 
 
-echo 
-"<script>
-  console.log('Variable: " . $randID. "' );
-</script>";
+$sql->close();
+mysqli_close($conn);
 
-echo 
-"<script>
-  console.log('Variable: " . $enInput. "' );
-</script>";
+} //END POST Method Action
 
-echo 
-"<script>
-  console.log('Variable: " . $deGenderInput. "' );
-</script>";
+// START GET Method Action 
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+  if (isset($_GET['prev'])) {
+      
+      // Create connection
+      $conn = new mysqli($servername, $username, $password, $dbname);
+      // Check connection
+      if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+      }
 
-echo 
-"<script>
-  console.log('Variable: " . $enInput. "' );
-</script>";
+      // SQL SELECT STATEMENT
+      $sql = "SELECT * FROM burgerg1_verblitz.Dictionary ORDER BY WordID DESC";
 
+      $result = $conn->query($sql);
 
+      if ($result->num_rows > 0) {
+        // output data of each row
+        while($row = $result->fetch_assoc()) {
+          //Assign PHP var with SQL val
+          $wordID = $row["WordID"];
+          $en = $row["en"];
+          
+          //Check deGender, print N/A if Null
+          if ($row["deGender"] == NULL) {
+            $deGender = "N/A";
+          } else {
+            $deGender = $row["deGender"];
+          }
 
+          $de = $row["de"]; 
+        }
+      } else {
+        echo "0 results";
+      }
+      $conn->close();
 
+  } if (isset($_GET['next'])) {
+      
+  
+      // Create connection
+      $conn = new mysqli($servername, $username, $password, $dbname);
+      // Check connection
+      if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+      }
 
+      // SQL SELECT STATEMENT
+      $sql = "SELECT * FROM burgerg1_verblitz.Dictionary";
 
+      $result = $conn->query($sql);
 
+      if ($result->num_rows > 0) {
+        // output data of each row
+        while($row = $result->fetch_assoc()) {
+          //Assign PHP var with SQL val
+          $wordID = $row["WordID"];
+          $en = $row["en"];
+          
+          //Check deGender, print N/A if Null
+          if ($row["deGender"] == NULL) {
+            $deGender = "N/A";
+          } else {
+            $deGender = $row["deGender"];
+          }
 
-// if ($result->num_rows > 0) {
-//   // output data of each row
-//   while($row = $result->fetch_assoc()) {
-//     //Assign PHP var with SQL val
-//     $wordID = $row["WordID"];
-//     $en = $row["en"];
-//     $deGender = $row["deGender"];
-//     $de = $row["de"];
+          $de = $row["de"]; 
+        }
+      } else {
+        echo "0 results";
+      }
+      $conn->close();
+  } if (isset($_GET['random'])) {
+      
+  
+    // Create connection
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    // Check connection
+    if ($conn->connect_error) {
+      die("Connection failed: " . $conn->connect_error);
+    }
 
-//     // Print to Console with PHP/JS
-//     // Loops through each instance
-//     echo 
-//     "<script>
-//       console.log('Variable: " . $wordID. "' );
-//     </script>";
-//   }
-// } else {
-//   echo "0 results";
-// }
+    // SQL SELECT STATEMENT
+    $sql = "SELECT * FROM burgerg1_verblitz.Dictionary ORDER BY RAND()";
 
-// Close connection 
-$conn->close();
+    $result = $conn->query($sql);
 
-}
+    if ($result->num_rows > 0) {
+      // output data of each row
+      while($row = $result->fetch_assoc()) {
+        //Assign PHP var with SQL val
+        $wordID = $row["WordID"]."<br>";
+        $en = $row["en"]."<br>";
+        
+        //Check deGender, print N/A if Null
+        if ($row["deGender"] == NULL) {
+          $deGender = "N/A"."<br>";
+        } else {
+          $deGender = $row["deGender"]."<br>";
+        }
+
+        $de = $row["de"]."<br>"; 
+      }
+    } else {
+      echo "0 results";
+    }
+      $conn->close();
+  } 
+} //End If statements for each button press
+
+  echo $wordID;
+
 ?>
-
 
 <!doctype html>
 <html lang="en">
@@ -117,7 +189,7 @@ $conn->close();
         <a class="nav-link" href="postword.php  ">postword.php</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
+        <a class="nav-link" href="getword.php">getword.php</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="#">Link</a>
@@ -153,34 +225,14 @@ $conn->close();
           </form>
 
         <!-- Assign Form Action to PHP_SELF -->
-        <form method="post" 
-              action="postword.php">
-            <p> English:<input type="text" name="en"></p>
-            
-            <p>
-            Gender:
-              <input checked="checked" type="radio" name="deGender" value="">N/A
-              <input type="radio" name="deGender" value="der">Male
-              <input type="radio" name="deGender" value="die">Female
-              <input type="radio" name="deGender" value="das">Neuter  
-            </p>
 
-            <p>German:<input type="text" name="de"></p>
-            <input type="submit" value="Submit w/postword.php">
-
-          </form>
 
       </div>
     </div>
 
     <div class="col-md-4">
-      <h3 id="valH3">Values</h3>
+      <h3 id="valH3">User Submitted Values</h3>
       <!-- PHP Prints Submitted Word Pair -->
-      <p id=wordID> 
-        WordID:
-        <?php echo $randID;?>    
-      </p>
-      
       <p id=en>
         English: 
         <?php echo $enInput;?>
@@ -195,19 +247,43 @@ $conn->close();
         German: 
         <?php echo $deInput;?>
       </p>
-
     </div>
 
     <div class="col-md-4">
       <h3>Selected Word Pair</h3>
+      <p id=en>
+        WordID: 
+        <?php echo $wordID;?>
+      </p>
+
+      <p id=en>
+        English: 
+        <?php echo $en;?>
+      </p>
       
+      <p id=deGender>
+        German Gender (if Noun): 
+        <?php echo $deGender;?>
+      </p>
+      
+      <p id=de>
+        German: 
+        <?php echo $de;?>
+      </p>
 
-      <form action="postword.php" method="get">
-        <input type="submit" class="btn btn-info" value="Prev Word">
-        <input type="submit" class="btn btn-info" value="Random">
-        <input type="submit" class="btn btn-info" value="Next Word">
+
+      <p>
+      <form method="get">
+        <input type="submit" name="prev" class="btn btn-info" value="Prev Word">
+        <input type="submit" name="next" class="btn btn-info" value="Next Word">
       </form>
+      </p>
 
+      <p>
+      <form  action = "getword.php" method="get">
+        <input type="submit" name="random" class="btn btn-info" value="Random">  
+      </form>
+      </p>
     </div>
   </div> <!-- END ROW -->
 
